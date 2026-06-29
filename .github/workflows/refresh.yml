@@ -1,0 +1,52 @@
+# ============================================================================
+#  Daily refresh of the Heathrow hygiene scoreboard data.
+#  Runs fetch.py on a schedule, then commits data.json if it changed.
+#  No server needed - GitHub runs this for free.
+#
+#  WHAT YOU MIGHT EDIT
+#    - The cron time below (currently 06:15 UTC daily).
+#    - Nothing else. fetch.py needs no API key and no extra packages.
+#
+#  FIRST-TIME SETUP
+#    1. Put this whole folder in a GitHub repository.
+#    2. Make sure venues.json exists (run resolve.py locally once and commit it).
+#    3. In the repo: Settings > Actions > General > Workflow permissions >
+#       enable "Read and write permissions" so the job can commit data.json.
+#    You can also trigger it by hand from the repo's Actions tab (Run workflow).
+# ============================================================================
+name: Refresh hygiene data
+
+on:
+  schedule:
+    - cron: "15 6 * * *"     # every day at 06:15 UTC
+  workflow_dispatch: {}       # lets you run it on demand from the Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Fetch the latest ratings
+        run: python3 fetch.py
+
+      - name: Commit data.json if it changed
+        run: |
+          git config user.name  "hygiene-bot"
+          git config user.email "actions@users.noreply.github.com"
+          if [ -n "$(git status --porcelain data.json)" ]; then
+            git add data.json
+            git commit -m "Refresh hygiene data ($(date -u +%Y-%m-%d))"
+            git push
+          else
+            echo "No change in data.json - nothing to commit."
+          fi

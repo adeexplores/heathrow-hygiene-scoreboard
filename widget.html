@@ -1,0 +1,255 @@
+<!-- ==========================================================================
+     widget.html  -  THE EMBEDDABLE HEATHROW HYGIENE SCOREBOARD
+     --------------------------------------------------------------------------
+     WHAT THIS IS
+       A single, self-contained page (HTML + CSS + vanilla JS, no frameworks).
+       It loads data.json (built by fetch.py) and shows a sortable, filterable
+       table of food hygiene ratings for venues near Heathrow.
+
+     WHAT YOU MIGHT EDIT  (look for the CONFIG block just below)
+       - DATA_URL : where data.json lives. "data.json" works when this file and
+                    data.json sit in the same folder/host. If you host the data
+                    somewhere else (e.g. GitHub Pages), put the full https URL.
+       - PAGE_SIZE: how many rows per page.
+
+     HOW TO EMBED IN XENFORO
+       Easiest: host this whole folder (e.g. GitHub Pages) and drop an iframe
+       into your XenForo page:
+         <iframe src="https://YOURSITE/widget.html" style="width:100%;height:1200px;border:0"></iframe>
+       Or paste this file's contents into an HTML block if your XenForo add-on
+       allows raw HTML/JS.
+
+     BADGES / FSA IMAGES
+       Official FSA rating images go in the images/ folder, named by rating key
+       (e.g. images/fhrs_5_en-gb.svg). See images/README.txt. Until they are
+       added, a plain neutral chip is shown so the page never looks broken.
+     ========================================================================== -->
+<div id="bta-hygiene">
+<style>
+#bta-hygiene{--bg:#fff;--ink:#1d2430;--muted:#5b6675;--line:#e6e9ee;--accent:#0b6e4f;--star:#c8932a;--chip:#eef1f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);max-width:1100px;margin:0 auto;padding:4px 2px 28px;box-sizing:border-box}
+#bta-hygiene *{box-sizing:border-box}
+#bta-hygiene h2{font-size:1.5rem;margin:.2em 0 .1em}
+#bta-hygiene .sub{color:var(--muted);font-size:.86rem;margin:0 0 14px}
+#bta-hygiene .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 12px}
+#bta-hygiene .controls input[type=search],#bta-hygiene select{padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:.9rem;background:#fff;color:var(--ink)}
+#bta-hygiene .controls input[type=search]{flex:1 1 220px;min-width:180px}
+#bta-hygiene .toggle{display:inline-flex;align-items:center;gap:6px;font-size:.88rem;color:var(--muted);cursor:pointer;user-select:none}
+#bta-hygiene table{width:100%;border-collapse:collapse;font-size:.9rem}
+#bta-hygiene thead th{position:sticky;top:0;background:#fafbfc;text-align:left;padding:10px 8px;border-bottom:2px solid var(--line);font-size:.78rem;letter-spacing:.02em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+#bta-hygiene thead th.sortable{cursor:pointer}
+#bta-hygiene thead th.sortable:hover{color:var(--ink)}
+#bta-hygiene thead th .arr{opacity:.45;font-size:.7rem}
+#bta-hygiene tbody td{padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+#bta-hygiene tbody tr:hover{background:#fafbfc}
+#bta-hygiene .name{font-weight:600;line-height:1.25}
+#bta-hygiene .meta{color:var(--muted);font-size:.78rem;margin-top:2px}
+#bta-hygiene .star{color:var(--star);font-weight:700}
+#bta-hygiene .badge img{height:52px;width:auto;display:block}
+#bta-hygiene .chip{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;min-width:46px;height:46px;border-radius:8px;background:var(--chip);border:1px solid var(--line);line-height:1}
+#bta-hygiene .chip b{font-size:1.25rem}
+#bta-hygiene .chip.r5{background:#0b6e4f;color:#fff;border-color:#0b6e4f}
+#bta-hygiene .chip.r4{background:#3a9d6e;color:#fff;border-color:#3a9d6e}
+#bta-hygiene .chip.r3{background:#c9d36a;color:#243}
+#bta-hygiene .chip.r2{background:#efb45a;color:#3a2a00}
+#bta-hygiene .chip.r1{background:#e07b3a;color:#fff;border-color:#e07b3a}
+#bta-hygiene .chip.r0{background:#cf3b2e;color:#fff;border-color:#cf3b2e}
+#bta-hygiene .chip.status{font-size:.62rem;font-weight:700;text-align:center;padding:4px;text-transform:uppercase;color:var(--muted);min-width:64px}
+#bta-hygiene .scores span{display:inline-block;min-width:22px;text-align:center;font-variant-numeric:tabular-nums}
+#bta-hygiene a.fsa{color:var(--accent);text-decoration:none;font-weight:600;white-space:nowrap}
+#bta-hygiene a.fsa:hover{text-decoration:underline}
+#bta-hygiene .pager{display:flex;gap:8px;align-items:center;justify-content:center;margin:16px 0 8px;flex-wrap:wrap}
+#bta-hygiene .pager button{padding:7px 12px;border:1px solid var(--line);background:#fff;border-radius:8px;cursor:pointer;font-size:.88rem}
+#bta-hygiene .pager button:disabled{opacity:.4;cursor:default}
+#bta-hygiene .note{font-size:.78rem;color:var(--muted);line-height:1.5;border-top:1px solid var(--line);margin-top:18px;padding-top:12px}
+#bta-hygiene .note a{color:var(--accent)}
+#bta-hygiene .empty{padding:30px;text-align:center;color:var(--muted)}
+@media(max-width:680px){#bta-hygiene .hide-sm{display:none}#bta-hygiene .badge img{height:44px}}
+</style>
+
+<h2>Heathrow Food Hygiene Scoreboard</h2>
+<p class="sub" id="bta-sub">Loading live ratings&hellip;</p>
+
+<div class="controls">
+  <input type="search" id="bta-search" placeholder="Search by name, postcode or area&hellip;" autocomplete="off">
+  <select id="bta-type"><option value="">All venue types</option></select>
+  <select id="bta-group"><option value="">All groups</option></select>
+  <select id="bta-rating">
+    <option value="">Any rating</option>
+    <option value="5">5 only</option><option value="4">4+</option>
+    <option value="3">3 or below</option><option value="low">2 or below</option>
+    <option value="status">Awaiting / Exempt</option>
+  </select>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th class="sortable" data-sort="name">Venue <span class="arr"></span></th>
+      <th class="sortable" data-sort="rating">Rating <span class="arr"></span></th>
+      <th class="hide-sm" title="Lower is better. 0 is the best possible score.">Scores <span style="font-weight:400;text-transform:none">(lower=better)</span></th>
+      <th class="sortable hide-sm" data-sort="date">Inspected <span class="arr"></span></th>
+      <th class="hide-sm">Authority</th>
+      <th>FSA page</th>
+    </tr>
+  </thead>
+  <tbody id="bta-body"></tbody>
+</table>
+
+<div class="pager" id="bta-pager"></div>
+<p class="note" id="bta-attr"></p>
+
+<script>
+(function(){
+  // ===================== CONFIG (safe to edit) =========================
+  var DATA_URL   = "data.json";  // path or full https URL to the data file
+  var PAGE_SIZE  = 50;           // rows per page
+  var IMG_BASE   = "images/";    // where the official FSA badge files live
+  var IMG_EXT    = ".png";       // badge file type (the supplied FSA badges are .png)
+  // =====================================================================
+
+  var ROOT = document.getElementById("bta-hygiene");
+  var STATUS_WORDS = {
+    AwaitingInspection:"Awaiting inspection", AwaitingPublication:"Awaiting publication",
+    Exempt:"Exempt", Pass:"Pass"
+  };
+  var state = {all:[], view:[], page:1, sort:"rating", dir:1};
+
+  function esc(s){return (s==null?"":String(s)).replace(/[&<>"]/g,function(c){return({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]);});}
+
+  function badge(r){
+    var num = r.ratingNumeric;
+    if(num===null||num===undefined){
+      var word = STATUS_WORDS[r.rating] || r.rating || "Not rated";
+      return '<span class="badge"><img src="'+IMG_BASE+esc(r.ratingKey)+IMG_EXT+'" alt="'+esc(word)+'" '+
+             'onerror="this.parentNode.innerHTML=\'<span class=&quot;chip status&quot;>'+esc(word)+'</span>\'"></span>';
+    }
+    // official FSA image first; neutral coloured chip as fallback so the page never breaks
+    var fb = '<span class=&quot;chip r'+num+'&quot;><b>'+num+'</b></span>';
+    return '<span class="badge"><img src="'+IMG_BASE+esc(r.ratingKey)+IMG_EXT+'" alt="Food hygiene rating '+num+' out of 5" '+
+           'onerror="this.parentNode.innerHTML=\''+fb+'\'"></span>';
+  }
+
+  function row(r){
+    var stale = r.stale ? '<span title="Last refresh could not reach the FSA; showing the previous value" style="color:var(--muted)">&#9888; </span>' : '';
+    var fsaNote = (r.fsaName && r.fsaName!==r.name) ? ' &middot; <span title="The FSA record this rating comes from">FSA: '+esc(r.fsaName)+'</span>' : '';
+    var typeBits = [r.businessType, r.postcode, r.group].filter(Boolean).join(" &middot; ") + fsaNote;
+    var sc = function(v){return '<span>'+(v==null?'&ndash;':v)+'</span>';};
+    var date = r.ratingDate ? r.ratingDate.split("-").reverse().join("/") : "&ndash;";
+    return '<tr>'+
+      '<td><div class="name">'+stale+esc(r.name)+'</div><div class="meta">'+typeBits+'</div></td>'+
+      '<td>'+badge(r)+'</td>'+
+      '<td class="scores hide-sm" title="Hygiene / Structural / Confidence in management (lower is better)">'+
+        sc(r.hygiene)+sc(r.structural)+sc(r.confidence)+'</td>'+
+      '<td class="hide-sm">'+date+'</td>'+
+      '<td class="hide-sm">'+esc(r.localAuthority||"")+'</td>'+
+      '<td><a class="fsa" href="'+esc(r.fsaUrl)+'" target="_blank" rel="noopener">View &#8599;</a></td>'+
+    '</tr>';
+  }
+
+  function applyFilters(){
+    var q = ROOT.querySelector("#bta-search").value.trim().toLowerCase();
+    var type = ROOT.querySelector("#bta-type").value;
+    var group = ROOT.querySelector("#bta-group").value;
+    var rating = ROOT.querySelector("#bta-rating").value;
+    state.view = state.all.filter(function(r){
+      if(type && r.businessType!==type) return false;
+      if(group && r.group!==group) return false;
+      if(rating){
+        var n=r.ratingNumeric;
+        if(rating==="status" && n!==null) return false;
+        if(rating==="5" && n!==5) return false;
+        if(rating==="4" && !(n>=4)) return false;
+        if(rating==="3" && !(n!==null&&n<=3)) return false;
+        if(rating==="low" && !(n!==null&&n<=2)) return false;
+      }
+      if(q){
+        var hay=(r.name+" "+(r.postcode||"")+" "+(r.group||"")+" "+(r.businessType||"")+" "+(r.localAuthority||"")).toLowerCase();
+        if(hay.indexOf(q)<0) return false;
+      }
+      return true;
+    });
+    sortView();
+    state.page=1;
+    render();
+  }
+
+  function sortView(){
+    var k=state.sort, d=state.dir;
+    state.view.sort(function(a,b){
+      if(k==="name") return d*(a.name||"").localeCompare(b.name||"");
+      if(k==="date") return d*((a.ratingDate||"")<(b.ratingDate||"")?-1:(a.ratingDate||"")>(b.ratingDate||"")?1:0);
+      // rating: numeric high->low by default; statuses last
+      var an=a.ratingNumeric, bn=b.ratingNumeric;
+      if(an===null&&bn===null) return (a.name||"").localeCompare(b.name||"");
+      if(an===null) return 1; if(bn===null) return -1;
+      return d*(bn-an);
+    });
+  }
+
+  function render(){
+    var body=ROOT.querySelector("#bta-body");
+    var total=state.view.length;
+    var pages=Math.max(1,Math.ceil(total/PAGE_SIZE));
+    if(state.page>pages) state.page=pages;
+    var start=(state.page-1)*PAGE_SIZE;
+    var slice=state.view.slice(start,start+PAGE_SIZE);
+    body.innerHTML = slice.length ? slice.map(row).join("") :
+      '<tr><td colspan="6" class="empty">No venues match those filters.</td></tr>';
+    // header arrows
+    ROOT.querySelectorAll("thead th.sortable").forEach(function(th){
+      var a=th.querySelector(".arr");
+      a.textContent = th.dataset.sort===state.sort ? (state.dir>0?"\u25B2":"\u25BC") : "";
+    });
+    // pager
+    var pg=ROOT.querySelector("#bta-pager");
+    if(pages<=1){pg.innerHTML="";}
+    else{
+      pg.innerHTML='<button id="bta-prev" '+(state.page<=1?"disabled":"")+'>&larr; Prev</button>'+
+        '<span style="font-size:.85rem;color:var(--muted)">Page '+state.page+' of '+pages+
+        ' &middot; '+total+' venues</span>'+
+        '<button id="bta-next" '+(state.page>=pages?"disabled":"")+'>Next &rarr;</button>';
+      ROOT.querySelector("#bta-prev").onclick=function(){state.page--;render();window.scrollTo({top:ROOT.offsetTop});};
+      ROOT.querySelector("#bta-next").onclick=function(){state.page++;render();window.scrollTo({top:ROOT.offsetTop});};
+    }
+  }
+
+  function fillSelect(id, values, label){
+    var sel=ROOT.querySelector(id);
+    values.sort().forEach(function(v){
+      var o=document.createElement("option"); o.value=v; o.textContent=v; sel.appendChild(o);
+    });
+  }
+
+  function init(data){
+    state.all=data.establishments||[];
+    var gen = data.generatedAt ? new Date(data.generatedAt) : null;
+    ROOT.querySelector("#bta-sub").innerHTML =
+      esc(data.count)+" Heathrow hotels and eateries. Live from the Food Standards Agency"+
+      (gen?", updated "+gen.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}):"")+".";
+    ROOT.querySelector("#bta-attr").innerHTML = data.attributionHtml||"";
+    fillSelect("#bta-type", Array.from(new Set(state.all.map(function(r){return r.businessType;}).filter(Boolean))));
+    var groups=Array.from(new Set(state.all.map(function(r){return r.group;}).filter(Boolean)));
+    if(groups.length) fillSelect("#bta-group", groups); else ROOT.querySelector("#bta-group").style.display="none";
+
+    ["#bta-search","#bta-type","#bta-group","#bta-rating"].forEach(function(s){
+      var el=ROOT.querySelector(s);
+      el.addEventListener(el.tagName==="INPUT"?"input":"change", applyFilters);
+    });
+    ROOT.querySelectorAll("thead th.sortable").forEach(function(th){
+      th.addEventListener("click",function(){
+        var k=th.dataset.sort;
+        if(state.sort===k) state.dir=-state.dir; else {state.sort=k; state.dir = (k==="rating")?1:1;}
+        sortView(); render();
+      });
+    });
+    applyFilters();
+  }
+
+  fetch(DATA_URL,{cache:"no-store"}).then(function(r){return r.json();}).then(init).catch(function(e){
+    ROOT.querySelector("#bta-sub").textContent =
+      "Could not load the ratings data. If you are opening this file directly, host it (or use a local server) so data.json can load.";
+    ROOT.querySelector("#bta-body").innerHTML='<tr><td colspan="6" class="empty">'+esc(String(e))+'</td></tr>';
+  });
+})();
+</script>
+</div>

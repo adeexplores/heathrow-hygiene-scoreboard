@@ -1,0 +1,108 @@
+<!-- ==========================================================================
+     badge.html  -  LIVE FSA RATING BADGE FOR A SINGLE REVIEW PAGE
+     --------------------------------------------------------------------------
+     WHAT THIS IS
+       A small, self-contained badge you drop onto an individual hotel or
+       restaurant review page. It shows that ONE venue's food hygiene rating,
+       pulled LIVE from the Food Standards Agency every time the page loads
+       (the FSA API allows direct browser calls), so it is always current.
+
+       It does NOT need data.json or the scoreboard - it talks to the FSA
+       directly. You only need the venue's FHRSID, which resolve.py prints for
+       each venue (and saves in venues.json).
+
+     HOW TO USE  (two steps)
+       1) ONCE per page (or once in your XenForo template): paste the <style>
+          and <script> blocks below.
+       2) Wherever you want the badge to appear, add ONE line with the venue's
+          FHRSID:
+              <div class="fsa-rating" data-fhrsid="519347"></div>
+          (519347 = Sofitel London Heathrow, as an example.)
+
+     WHAT YOU MIGHT EDIT  (see the CONFIG block in the script)
+       - IMG_BASE: the FULL web address of your images/ folder, e.g.
+         "https://beyondtheairport.com/hygiene-scoreboard/images/". Review pages
+         live at different URLs, so an absolute address is safest.
+       - SHOW_NAME: set to true to print the business name above the badge.
+
+     COMPLIANCE
+       Uses the official FSA images, shows the inspection date, links to the FSA
+       page, only ever shows the current rating, and states this is not an FSA
+       endorsement - in line with the FSA terms.
+     ========================================================================== -->
+
+<!-- ----- STEP 1: paste this <style> once per page ----- -->
+<style>
+.fsa-rating{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;display:inline-block;max-width:340px;color:#1d2430}
+.fsa-rating a.fsa-img{display:block;text-decoration:none}
+.fsa-rating .fsa-badge{height:84px;width:auto;display:block}
+.fsa-rating .fsa-chip{display:inline-flex;align-items:center;justify-content:center;min-width:74px;height:62px;border-radius:8px;background:#0b6e4f;color:#fff;font-size:1.7rem;font-weight:700;border:2px solid #0b6e4f}
+.fsa-rating .fsa-chip.status{background:#eef1f5;color:#5b6675;font-size:.7rem;font-weight:700;text-transform:uppercase;text-align:center;padding:6px;min-width:96px}
+.fsa-rating .fsa-meta{font-size:.74rem;line-height:1.45;color:#5b6675;margin-top:6px}
+.fsa-rating .fsa-meta a{color:#0b6e4f}
+.fsa-rating .fsa-name{font-weight:600;font-size:.9rem;margin-bottom:4px}
+.fsa-rating.loading .fsa-meta{opacity:.6}
+</style>
+
+<!-- ----- STEP 2: one of these per venue, anywhere on the page ----- -->
+<div class="fsa-rating" data-fhrsid="519347"></div>
+
+<!-- ----- STEP 1 (cont.): paste this <script> once per page ----- -->
+<script>
+(function(){
+  // ===================== CONFIG (safe to edit) =========================
+  // Full address of your images folder (with trailing slash). Set this to your
+  // live site so the badge images load on every review page.
+  var IMG_BASE = "/hygiene-scoreboard/images/";
+  var IMG_EXT  = ".png";          // the supplied FSA badges are .png
+  var SHOW_NAME = false;          // true = print the business name above the badge
+  // =====================================================================
+
+  var API   = "https://api.ratings.food.gov.uk/Establishments/";
+  var STATUS = {AwaitingInspection:"Awaiting inspection",AwaitingPublication:"Awaiting publication",Exempt:"Exempt",Pass:"Pass"};
+
+  function esc(s){return (s==null?"":String(s)).replace(/[&<>"]/g,function(c){return({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]);});}
+  function slug(s){return (s||"business").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");}
+  function ukDate(d){return d?d.slice(0,10).split("-").reverse().join("/"):"";}
+
+  function render(el, e){
+    var rating = e.RatingValue;
+    var isNum = /^[0-5]$/.test(String(rating));
+    var key = e.RatingKey;
+    var fsa = "https://ratings.food.gov.uk/business/"+slug(e.BusinessName)+"/"+e.FHRSID;
+    var alt = isNum ? ("Food hygiene rating "+rating+" out of 5") : (STATUS[rating]||rating||"Not rated");
+    var img = '<img class="fsa-badge" src="'+IMG_BASE+esc(key)+IMG_EXT+'" alt="'+esc(alt)+'" '+
+              'onerror="this.outerHTML=\''+(isNum
+                 ? '<span class=&quot;fsa-chip&quot;>'+rating+'</span>'
+                 : '<span class=&quot;fsa-chip status&quot;>'+esc(STATUS[rating]||rating||"Not rated")+'</span>')+'\'">';
+    var name = SHOW_NAME ? '<div class="fsa-name">'+esc(e.BusinessName)+'</div>' : '';
+    var dateline = e.RatingDate ? ("Rated at the last inspection on "+ukDate(e.RatingDate)+". ") : "";
+    el.classList.remove("loading");
+    el.innerHTML =
+      name +
+      '<a class="fsa-img" href="'+fsa+'" target="_blank" rel="noopener" title="View on the FSA site">'+img+'</a>'+
+      '<div class="fsa-meta">'+dateline+'Source: '+
+        '<a href="'+fsa+'" target="_blank" rel="noopener">Food Standards Agency</a>'+
+        ' (Open Government Licence). Ratings can change; right to reply applies. '+
+        'Not an FSA endorsement.</div>';
+  }
+
+  function load(el){
+    var id = el.getAttribute("data-fhrsid");
+    if(!id) return;
+    el.classList.add("loading");
+    el.innerHTML = '<div class="fsa-meta">Loading food hygiene rating&hellip;</div>';
+    fetch(API+encodeURIComponent(id), {headers:{"x-api-version":"2","accept":"application/json"}})
+      .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
+      .then(function(e){ render(el, e); })
+      .catch(function(){
+        el.classList.remove("loading");
+        el.innerHTML = '<div class="fsa-meta">Food hygiene rating unavailable right now. '+
+          '<a href="https://ratings.food.gov.uk/business/_/'+esc(id)+'" target="_blank" rel="noopener">Check on the FSA site</a>.</div>';
+      });
+  }
+
+  function init(){ document.querySelectorAll(".fsa-rating[data-fhrsid]").forEach(load); }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", init); else init();
+})();
+</script>

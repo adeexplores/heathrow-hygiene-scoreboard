@@ -1,0 +1,69 @@
+# ============================================================================
+#  venues.csv  -  THE VENUES THE SCOREBOARD SHOWS
+#  Format:  name,postcode,group,fhrsid
+#    - fhrsid (4th column) LOCKS the venue to a specific FSA record. It was
+#      filled in by matching each HTT hotel to its food-hygiene record near its
+#      exact location. Leave it as-is unless a venue moves/closes.
+#    - To add a NEW venue you can leave fhrsid blank and run resolve.py; it will
+#      look it up by name+postcode (and flag anything unclear).
+#  Lines starting with #  are ignored.  After editing: resolve.py then fetch.py
+# ============================================================================
+name,postcode,group,fhrsid
+Sofitel London Heathrow,,Terminal 5,519347
+Thistle London Heathrow T5,,Terminal 5,519844
+Premier Inn London Heathrow T5,,Terminal 5,519281
+Sheraton Heathrow Hotel,,Bath Road,519852
+Hyatt Place London Heathrow,,Bath Road,519306
+# NOTE (Staybridge Suites / Holiday Inn Bath Road): shared kitchen (Staybridge + Holiday Inn Bath Road)
+Staybridge Suites / Holiday Inn Bath Road,,Bath Road,1095940
+Leonardo Hotel London Heathrow,,Bath Road,519301
+Radisson RED London Heathrow,,Bath Road,518684
+Aerotel London Heathrow,,Central,1661140
+ibis Styles London Heathrow,,Bath Road,910259
+Renaissance London Heathrow,,Bath Road,520204
+Radisson Blu Edwardian Heathrow,,Bath Road,1742446
+London Heathrow Marriott,,Bath Road,1836231
+Sheraton Skyline Hotel,,Bath Road,520206
+Best Western Heathrow Ariel,,Bath Road,1354702
+ibis London Heathrow,,Bath Road,657530
+Premier Inn London Heathrow T2/T3,,Bath Road,519050
+Moxy London Heathrow,,Cranford,1466590
+# NOTE (ibis budget London Heathrow Central): tentative: FSA record 'Ibis', 700 Bath Road TW5 9TW - confirm
+ibis budget London Heathrow Central,,Cranford,490443
+Atrium Hotel Heathrow,,Hatton Cross,1501854
+Premier Inn London Heathrow T4,,Terminal 4,1000595
+Hilton London Heathrow T4,,Terminal 4,520094
+# NOTE (Crowne Plaza / Holiday Inn Express T4): shared kitchen (Crowne Plaza + Holiday Inn Express T4)
+Crowne Plaza / Holiday Inn Express T4,,Terminal 4,1207522
+Hilton London Heathrow T5,,Colnbrook / M4,1683444
+Premier Inn London Heathrow M4 J4,,M4 J4,518938
+
+# ---- HTT eateries (the places mentioned in HTT), resolved to FSA ----
+The Globe Pub & Kitchen,TW6 2GA,Eatery,1486351
+Kaniz Indian,UB7 0DE,Eatery,1453394
+Achari Indian Restaurant,UB7 0HU,Eatery,1641951
+McDonald’s,UB7 0EA,Eatery,1536935
+The Three Magpies,TW6 2AU,Eatery,520146
+Ostrich Inn,SL3 0JZ,Eatery,816858
+The Pheasant Inn,UB3 5LX,Eatery,520243
+New Bettola,SL3 0NZ,Eatery,1804535
+The White Horse,UB7 0EE,Eatery,519822
+BJ’s Sandwich Bar,UB7 0DE,Eatery,519994
+Istanbul Grill,UB7 0DE,Eatery,997111
+# FLAGGED eateries - no FSA match by name/location (closed or renamed?):
+# Zayani,,Eatery,
+# The Queens Arms,,Eatery,
+
+# ---------------------------------------------------------------------------
+# FLAGGED - no clean FSA food-hygiene record found near the hotel. These are
+# left OFF the board until you confirm an FSA ID. Find each on
+# https://ratings.food.gov.uk , copy the number at the end of its URL into the
+# 4th column, then run fetch.py.
+# (HGI Terminal 2/3 and HGI Hatton Cross appear to have no separately-rated
+#  restaurant; Courtyard had no nearby food record; B&B's nearest candidate was
+#  "Colnbrook Hotel London Heathrow" FHRSID 1713130 - confirm it is the same building.)
+# ---------------------------------------------------------------------------
+# Hilton Garden Inn London Heathrow T2/T3,TW6 1QG,Central,
+# Courtyard by Marriott London Heathrow,UB3 5AW,Bath Road,
+# Hilton Garden Inn London Heathrow (Hatton Cross),TW6 2SQ,Hatton Cross,
+# B&B Hotel London Heathrow,SL3 0PH,Colnbrook / M4,1713130
