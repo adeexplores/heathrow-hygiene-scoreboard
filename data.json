@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-08-20T07:06:57Z",
+ "generatedAt": "2026-08-21T07:08:14Z",
  "count": 36,
  "attributionHtml": "Food hygiene ratings &copy; Food Standards Agency, reused under the <a href=\"https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/\" target=\"_blank\" rel=\"noopener\">Open Government Licence v3.0</a>. Each rating reflects the standards found at that venue&rsquo;s last inspection (date shown) and can change; businesses have a right to reply. Beyond the Airport is not affiliated with, or endorsed by, the Food Standards Agency. Always confirm the current rating on the <a href=\"https://ratings.food.gov.uk\" target=\"_blank\" rel=\"noopener\">FSA site</a>.",
  "establishments": [
@@ -662,10 +662,10 @@
    "rating": "4",
    "ratingNumeric": 4,
    "ratingKey": "fhrs_4_en-gb",
-   "ratingDate": "2025-04-23",
-   "hygiene": null,
-   "structural": null,
-   "confidence": null,
+   "ratingDate": "2026-07-16",
+   "hygiene": 5,
+   "structural": 5,
+   "confidence": 10,
    "localAuthority": "Slough",
    "postcode": "SL3 0JZ",
    "address": "THE OSTRICH INN HIGH STREET, COLNBROOK, SLOUGH",
