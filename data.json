@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-10-28T12:58:26Z",
+ "generatedAt": "2026-10-29T13:04:51Z",
  "count": 36,
  "attributionHtml": "Food hygiene ratings &copy; Food Standards Agency, reused under the <a href=\"https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/\" target=\"_blank\" rel=\"noopener\">Open Government Licence v3.0</a>. Each rating reflects the standards found at that venue&rsquo;s last inspection (date shown) and can change; businesses have a right to reply. Beyond the Airport is not affiliated with, or endorsed by, the Food Standards Agency. Always confirm the current rating on the <a href=\"https://ratings.food.gov.uk\" target=\"_blank\" rel=\"noopener\">FSA site</a>.",
  "establishments": [
@@ -382,27 +382,6 @@
    "stale": false
   },
   {
-   "fhrsid": 1742446,
-   "name": "Radisson Blu Edwardian Heathrow",
-   "fsaName": "Radisson Blu London Heathrow",
-   "businessType": "Hotel/bed & breakfast/guest house",
-   "rating": "5",
-   "ratingNumeric": 5,
-   "ratingKey": "fhrs_5_en-gb",
-   "ratingDate": "2024-09-18",
-   "hygiene": 0,
-   "structural": 5,
-   "confidence": 0,
-   "localAuthority": "Hillingdon",
-   "postcode": "UB3 5AW",
-   "address": "140 Bath Road, Heathrow",
-   "lat": "51.4815301",
-   "lon": "-0.4414122",
-   "fsaUrl": "https://ratings.food.gov.uk/business/radisson-blu-london-heathrow/1742446",
-   "group": "Bath Road",
-   "stale": false
-  },
-  {
    "fhrsid": 518684,
    "name": "Radisson RED London Heathrow",
    "fsaName": "Radisson Red Hotel",
@@ -715,6 +694,27 @@
    "lon": "-0.473804",
    "fsaUrl": "https://ratings.food.gov.uk/business/kaniz-restaurant-heathrow/1453394",
    "group": "Eatery",
+   "stale": false
+  },
+  {
+   "fhrsid": 1742446,
+   "name": "Radisson Blu Edwardian Heathrow",
+   "fsaName": "Radisson Blu London Heathrow",
+   "businessType": "Hotel/bed & breakfast/guest house",
+   "rating": "3",
+   "ratingNumeric": 3,
+   "ratingKey": "fhrs_3_en-gb",
+   "ratingDate": "2026-09-23",
+   "hygiene": 10,
+   "structural": 5,
+   "confidence": 10,
+   "localAuthority": "Hillingdon",
+   "postcode": "UB3 5AW",
+   "address": "140 Bath Road, Heathrow",
+   "lat": "51.4815301",
+   "lon": "-0.4414122",
+   "fsaUrl": "https://ratings.food.gov.uk/business/radisson-blu-london-heathrow/1742446",
+   "group": "Bath Road",
    "stale": false
   },
   {
