@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-18T15:41:49Z",
+ "generatedAt": "2026-11-19T15:46:40Z",
  "count": 36,
  "attributionHtml": "Food hygiene ratings &copy; Food Standards Agency, reused under the <a href=\"https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/\" target=\"_blank\" rel=\"noopener\">Open Government Licence v3.0</a>. Each rating reflects the standards found at that venue&rsquo;s last inspection (date shown) and can change; businesses have a right to reply. Beyond the Airport is not affiliated with, or endorsed by, the Food Standards Agency. Always confirm the current rating on the <a href=\"https://ratings.food.gov.uk\" target=\"_blank\" rel=\"noopener\">FSA site</a>.",
  "establishments": [
@@ -144,8 +144,8 @@
    "localAuthority": "Hillingdon",
    "postcode": "UB7 0DG",
    "address": "The Grove, Bath Road, Heathrow",
-   "lat": null,
-   "lon": null,
+   "lat": "51.482502",
+   "lon": "-0.468084",
    "fsaUrl": "https://ratings.food.gov.uk/business/hyatt-place-london-heathrow/519306",
    "group": "Bath Road",
    "stale": false
@@ -564,8 +564,8 @@
    "localAuthority": "Hillingdon",
    "postcode": "UB7 0EQ",
    "address": "Thistle London Heathrow Hotel, Bath Road, Longford",
-   "lat": null,
-   "lon": null,
+   "lat": "51.480483",
+   "lon": "-0.483676",
    "fsaUrl": "https://ratings.food.gov.uk/business/thistle-london-heathrow-hotel/519844",
    "group": "Terminal 5",
    "stale": false
